@@ -1,0 +1,121 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Algo.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avalonia="http://oxyplot.org/avalonia"
+        xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Collections"
+        xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.Runtime"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Algo.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Algo">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="auto, *"
+          ColumnDefinitions="Auto, 5, *">
+        <Grid Grid.Column="0"
+              Grid.ColumnSpan="3"
+              ColumnDefinitions="*, Auto">
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center">От:</Label>
+                <NumericUpDown Increment="0.1"
+                               Maximum="{Binding To}"
+                               Value="{Binding From}" />
+                
+                <Label VerticalAlignment="Center">До:</Label>
+                <NumericUpDown Increment="0.1"
+                               Minimum="{Binding From}"
+                               Value="{Binding To}" />
+                
+                <Label VerticalAlignment="Center">Степень полинома:</Label>
+                <NumericUpDown Minimum="10"
+                               Value="{Binding Steps}" />
+                
+                <Label VerticalAlignment="Center">Узлы:</Label>
+                <ComboBox Name="PointsComboBox"
+                          SelectedIndex="0"
+                          SelectionChanged="PointPlacementMethodChangedEvent">
+                </ComboBox>
+            </StackPanel>
+
+            <Button Grid.Column="1"
+                    Command="{Binding RenderPlotCommand}">
+                Отрисовать!
+            </Button>
+        </Grid>
+
+        <Grid RowDefinitions="* Auto"
+              ColumnDefinitions="* *"
+              Grid.Row="1"
+              Grid.Column="0">
+            <DataGrid Name="PointDataGrid"
+                      IsReadOnly="False"
+                      Items="{Binding InitialPoints}"
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      Grid.Column="0"
+                      CellEditEnded="PointsChangedEvent">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="X"
+                                        Binding="{Binding X}"
+                                        IsReadOnly="False" />
+                    <DataGridTextColumn Header="Y"
+                                        Binding="{Binding Y}"
+                                        IsReadOnly="False" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Button Command="{Binding }" 
+                HorizontalAlignment="Stretch"
+                    Grid.Row="1"
+                    Grid.Column="0">
+                По функции...
+            </Button>
+
+            <Button Command="{Binding AddNewPointCommand}"
+                    Grid.Row="1"
+                    Grid.Column="1">
+                +
+            </Button>
+        </Grid>
+
+        <GridSplitter ResizeDirection="Columns"
+                      Grid.Row="1"
+                      Grid.Column="1" />
+
+        <avalonia:Plot PlotMargins="50 50 50 50"
+                       PlotAreaBorderColor="#999999"
+                       PlotType="Cartesian"
+                       Grid.Row="1"
+                       Grid.Column="2">
+            <avalonia:Plot.Legends>
+                <avalonia:Legend LegendTitle="Легенда:" />
+            </avalonia:Plot.Legends>
+
+            <avalonia:Plot.Axes>
+                <avalonia:LinearAxis Position="Bottom" Title="X" />
+                <avalonia:LinearAxis Position="Left" Title="Y" />
+            </avalonia:Plot.Axes>
+
+            <avalonia:Plot.Series>
+                <avalonia:ScatterSeries
+                    Title="Начальные точки"
+                    DataFieldX="X"
+                    DataFieldY="Y"
+                    Items="{Binding Path=InitialPointSeries}"
+                    Color="#0000ff" />
+                <avalonia:LineSeries
+                    Title="Интерполяция"
+                    DataFieldX="X"
+                    DataFieldY="Y"
+                    Items="{Binding Path=InterpolatedPointSeries}"
+                    Color="#fd6d00" />
+            </avalonia:Plot.Series>
+        </avalonia:Plot>
+    </Grid>
+
+</Window>
